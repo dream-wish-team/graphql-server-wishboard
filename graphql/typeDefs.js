@@ -3,19 +3,20 @@ const { gql } = require('apollo-server');
 module.exports = gql`
   type Wish {
     id: ID!
-    name: String
-    createdAt: String
-    price: Price
-    image: Image
-    backgroundColor: String
-    active: [Active]
-    fulfilled: [Fulfilled]
-    comments: [Comment]
-    likes: [Like]
-    likeCount: Int
-    commentCount: Int
-    activeCount: Int
-    fulfilledCount: Int
+    name: String!
+    createdAt: String!
+    price: Price!
+    image: Image!
+    username: String!
+    backgroundColor: String!
+    active: [Active]!
+    fulfilled: [Fulfilled]!
+    comments: [Comment]!
+    likes: [Like]!
+    likeCount: Int!
+    commentCount: Int!
+    activeCount: Int!
+    fulfilledCount: Int!
   }
   type Price {
     value: String!
@@ -65,7 +66,7 @@ module.exports = gql`
   type Mutation {
     register(registerInput: RegisterInput): User!
     login(username: String!, password: String!): User!
-    createWish(body: String!): Wish!
+    createWish(name: String!, price: String!, image: String!): Wish!
     deleteWish(wishId: ID!): String!
     createComment(wishId: ID!, body: String!): Wish!
     deleteComment(wishId: ID!, commentId: ID!): Wish!

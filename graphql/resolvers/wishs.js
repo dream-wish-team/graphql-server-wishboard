@@ -7,8 +7,7 @@ module.exports = {
   Query: {
     async getWishs() {
       try {
-        const wishs = await Wish.find();
-        console.log(wishs);
+        const wishs = await Wish.find().sort({ createdAt: -1 });
         return wishs;
       } catch (err) {
         throw new Error(err);
@@ -51,7 +50,7 @@ module.exports = {
         username: user.username,
         createdAt: new Date().toISOString(),
       });
-
+      console.log(newWish);
       const wish = await newWish.save();
 
       context.pubsub.publish('NEW_WISH', {
@@ -62,10 +61,13 @@ module.exports = {
     },
     async deleteWish(_, { wishId }, context) {
       const user = checkAuth(context);
-
       try {
         const wish = await Wish.findById(wishId);
-        if (user.username === wish.username) {
+        console.log(wish.username);
+        console.log(user.username);
+        console.log(user.id === wish.user);
+        if (user.id === wish.user) {
+          console.log(user.id === wish.user);
           await wish.delete();
           return 'Wish deleted successfully';
         } else {
