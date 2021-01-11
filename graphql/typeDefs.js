@@ -1,26 +1,49 @@
 const { gql } = require('apollo-server');
 
 module.exports = gql`
-  type Post {
+  type Wish {
     id: ID!
-    body: String!
+    name: String
+    createdAt: String
+    price: Price
+    image: Image
+    backgroundColor: String
+    active: [Active]
+    fulfilled: [Fulfilled]
+    comments: [Comment]
+    likes: [Like]
+    likeCount: Int
+    commentCount: Int
+    activeCount: Int
+    fulfilledCount: Int
+  }
+  type Price {
+    value: String!
+    currency: String!
+  }
+  type Image {
+    small: String!
+  }
+  type Like {
+    id: ID!
     createdAt: String!
     username: String!
-    comments: [Comment]!
-    likes: [Like]!
-    likeCount: Int!
-    commentCount: Int!
+  }
+  type Active {
+    id: ID!
+    createdAt: String!
+    username: String!
+  }
+  type Fulfilled {
+    id: ID!
+    createdAt: String!
+    username: String!
   }
   type Comment {
     id: ID!
     createdAt: String!
     username: String!
     body: String!
-  }
-  type Like {
-    id: ID!
-    createdAt: String!
-    username: String!
   }
   type User {
     id: ID!
@@ -36,19 +59,19 @@ module.exports = gql`
     email: String!
   }
   type Query {
-    getPosts: [Post]
-    getPost(postId: ID!): Post
+    getWishs: [Wish]
+    getWish(wishId: ID!): Wish
   }
   type Mutation {
     register(registerInput: RegisterInput): User!
     login(username: String!, password: String!): User!
-    createPost(body: String!): Post!
-    deletePost(postId: ID!): String!
-    createComment(postId: String!, body: String!): Post!
-    deleteComment(postId: ID!, commentId: ID!): Post!
-    likePost(postId: ID!): Post!
+    createWish(body: String!): Wish!
+    deleteWish(wishId: ID!): String!
+    createComment(wishId: ID!, body: String!): Wish!
+    deleteComment(wishId: ID!, commentId: ID!): Wish!
+    likeWish(wishId: ID!): Wish!
   }
   type Subscription {
-    newPost: Post!
+    newWish: Wish!
   }
 `;
