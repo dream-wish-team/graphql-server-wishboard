@@ -1,50 +1,50 @@
 const { AuthenticationError, UserInputError } = require('apollo-server');
 
 const checkAuth = require('../../util/check-auth');
-const Post = require('../../models/Post');
+const Wish = require('../../models/Wish');
 
 module.exports = {
   Mutation: {
-    createComment: async (_, { postId, body }, context) => {
+    createComment: async (_, { wishId, body }, context) => {
       const { username } = checkAuth(context);
       if (body.trim() === '') {
         throw new UserInputError('Empty comment', {
           errors: {
-            body: 'Comment body must not empty'
-          }
+            body: 'Comment body must not empty',
+          },
         });
       }
 
-      const post = await Post.findById(postId);
+      const wish = await Wish.findById(wishId);
 
-      if (post) {
-        post.comments.unshift({
+      if (wish) {
+        wish.comments.unshift({
           body,
           username,
-          createdAt: new Date().toISOString()
+          createdAt: new Date().toISOString(),
         });
-        await post.save();
-        return post;
-      } else throw new UserInputError('Post not found');
+        await wish.save();
+        return wish;
+      } else throw new UserInputError('Wish not found');
     },
-    async deleteComment(_, { postId, commentId }, context) {
+    async deleteComment(_, { wishId, commentId }, context) {
       const { username } = checkAuth(context);
 
-      const post = await Post.findById(postId);
+      const wish = await Wish.findById(wishId);
 
-      if (post) {
-        const commentIndex = post.comments.findIndex((c) => c.id === commentId);
+      if (wish) {
+        const commentIndex = wish.comments.findIndex((c) => c.id === commentId);
 
-        if (post.comments[commentIndex].username === username) {
-          post.comments.splice(commentIndex, 1);
-          await post.save();
-          return post;
+        if (wish.comments[commentIndex].username === username) {
+          wish.comments.splice(commentIndex, 1);
+          await wish.save();
+          return wish;
         } else {
           throw new AuthenticationError('Action not allowed');
         }
       } else {
-        throw new UserInputError('Post not found');
+        throw new UserInputError('Wish not found');
       }
-    }
-  }
+    },
+  },
 };
