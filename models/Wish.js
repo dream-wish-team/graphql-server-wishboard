@@ -7,7 +7,7 @@ const wishSchema = new Schema({
     value: Number,
     currency: String,
   },
-  creator: {
+  user: {
     type: Schema.Types.ObjectId,
     ref: 'users',
   },
