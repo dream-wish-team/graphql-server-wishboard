@@ -66,7 +66,12 @@ module.exports = gql`
   type Mutation {
     register(registerInput: RegisterInput): User!
     login(username: String!, password: String!): User!
-    createWish(name: String!, price: String!, image: String!): Wish!
+    createWish(
+      name: String!
+      price: String!
+      currency: String!
+      image: String!
+    ): Wish!
     deleteWish(wishId: ID!): String!
     createComment(wishId: ID!, body: String!): Wish!
     deleteComment(wishId: ID!, commentId: ID!): Wish!

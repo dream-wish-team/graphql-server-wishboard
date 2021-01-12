@@ -3,6 +3,7 @@ const { model, Schema } = require('mongoose');
 const wishSchema = new Schema({
   name: String,
   createdAt: String,
+  username: String,
   price: {
     value: Number,
     currency: String,
