@@ -60,7 +60,7 @@ module.exports = gql`
     email: String!
   }
   type Query {
-    getWishs: [Wish]
+    getWishes: [Wish]
     getWish(wishId: ID!): Wish
   }
   type Mutation {

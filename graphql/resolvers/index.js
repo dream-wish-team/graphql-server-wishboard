@@ -1,4 +1,4 @@
-const wishsResolvers = require('./wishs');
+const wishesResolvers = require('./wishes');
 const usersResolvers = require('./users');
 const commentsResolvers = require('./comments');
 
@@ -8,14 +8,14 @@ module.exports = {
     commentCount: (parent) => parent.comments.length
   },
   Query: {
-    ...wishsResolvers.Query
+    ...wishesResolvers.Query
   },
   Mutation: {
     ...usersResolvers.Mutation,
-    ...wishsResolvers.Mutation,
+    ...wishesResolvers.Mutation,
     ...commentsResolvers.Mutation
   },
   Subscription: {
-    ...wishsResolvers.Subscription
+    ...wishesResolvers.Subscription
   }
 };

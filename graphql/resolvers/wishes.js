@@ -5,7 +5,7 @@ const checkAuth = require('../../util/check-auth');
 
 module.exports = {
   Query: {
-    async getWishs() {
+    async getWishes() {
       try {
         const wishs = await Wish.find().sort({ createdAt: -1 });
         return wishs;
