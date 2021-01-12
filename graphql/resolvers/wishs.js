@@ -27,30 +27,32 @@ module.exports = {
     },
   },
   Mutation: {
-    async createWish(_, { name, price, image }, context) {
+    async createWish(_, { name, price, currency, image }, context) {
       const user = checkAuth(context);
-
       if (name.trim() === '') {
         throw new Error('Wish name must not be empty');
       }
-
       if (price.trim() === '') {
         throw new Error('Wish price must not be empty');
       }
-
+      if (currency.trim() === '') {
+        throw new Error('Wish price must not be empty');
+      }
       if (image.trim() === '') {
         throw new Error('Wish image must not be empty');
       }
 
       const newWish = new Wish({
         name,
-        price,
+        price: {
+          value: price,
+          currency,
+        },
         image,
         user: user.id,
         username: user.username,
         createdAt: new Date().toISOString(),
       });
-      console.log(newWish);
       const wish = await newWish.save();
 
       context.pubsub.publish('NEW_WISH', {
@@ -63,11 +65,7 @@ module.exports = {
       const user = checkAuth(context);
       try {
         const wish = await Wish.findById(wishId);
-        console.log(wish.username);
-        console.log(user.username);
-        console.log(user.id === wish.user);
-        if (user.id === wish.user) {
-          console.log(user.id === wish.user);
+        if (user.username === wish.username) {
           await wish.delete();
           return 'Wish deleted successfully';
         } else {
