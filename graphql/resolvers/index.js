@@ -5,17 +5,19 @@ const commentsResolvers = require('./comments');
 module.exports = {
   Wish: {
     likeCount: (parent) => parent.likes.length,
-    commentCount: (parent) => parent.comments.length
+    commentCount: (parent) => parent.comments.length,
+    fulfilledCount: (parent) => parent.fulfilled.length,
+    activeCount: (parent) => parent.active.length,
   },
   Query: {
-    ...wishesResolvers.Query
+    ...wishesResolvers.Query,
   },
   Mutation: {
     ...usersResolvers.Mutation,
     ...wishesResolvers.Mutation,
-    ...commentsResolvers.Mutation
+    ...commentsResolvers.Mutation,
   },
   Subscription: {
-    ...wishesResolvers.Subscription
-  }
+    ...wishesResolvers.Subscription,
+  },
 };
