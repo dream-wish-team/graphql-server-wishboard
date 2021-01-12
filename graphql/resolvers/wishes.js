@@ -1,6 +1,7 @@
 const { AuthenticationError, UserInputError } = require('apollo-server');
 
 const Wish = require('../../models/Wish');
+const User = require('../../models/User');
 const checkAuth = require('../../util/check-auth');
 
 module.exports = {
@@ -27,8 +28,13 @@ module.exports = {
     },
   },
   Mutation: {
-    async createWish(_, { name, price, currency, image }, context) {
+    async createWish(
+      _,
+      { name, price, currency, backgroundColor, image },
+      context
+    ) {
       const user = checkAuth(context);
+      const infoUser = await User.findById(user.id);
       if (name.trim() === '') {
         throw new Error('Wish name must not be empty');
       }
@@ -38,19 +44,27 @@ module.exports = {
       if (currency.trim() === '') {
         throw new Error('Wish price must not be empty');
       }
+      if (backgroundColor.trim() === '') {
+        throw new Error('Wish price must not be empty');
+      }
       if (image.trim() === '') {
         throw new Error('Wish image must not be empty');
       }
-
       const newWish = new Wish({
         name,
         price: {
           value: price,
           currency,
         },
-        image,
-        user: user.id,
-        username: user.username,
+        image: {
+          small: image,
+        },
+        backgroundColor,
+        creator: {
+          id: user.id,
+          username: user.username,
+          avatarSmall: infoUser.avatarSmall,
+        },
         createdAt: new Date().toISOString(),
       });
       const wish = await newWish.save();

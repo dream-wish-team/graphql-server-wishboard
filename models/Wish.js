@@ -8,9 +8,13 @@ const wishSchema = new Schema({
     value: Number,
     currency: String,
   },
-  user: {
-    type: Schema.Types.ObjectId,
-    ref: 'users',
+  creator: {
+    id: {
+      type: Schema.Types.ObjectId,
+      ref: 'users',
+    },
+    username: String,
+    avatarSmall: String,
   },
   image: {
     small: String,

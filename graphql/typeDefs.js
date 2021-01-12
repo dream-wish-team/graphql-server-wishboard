@@ -5,9 +5,9 @@ module.exports = gql`
     id: ID!
     name: String!
     createdAt: String!
+    creator: TCreator!
     price: Price!
     image: Image!
-    username: String!
     backgroundColor: String!
     active: [Active]!
     fulfilled: [Fulfilled]!
@@ -18,6 +18,13 @@ module.exports = gql`
     activeCount: Int!
     fulfilledCount: Int!
   }
+
+  type TCreator {
+    id: ID!
+    username: String!
+    avatarSmall: String!
+  }
+
   type Price {
     value: String!
     currency: String!
@@ -51,6 +58,8 @@ module.exports = gql`
     email: String!
     token: String!
     username: String!
+    avatarSmall: String!
+    avatarBig: String!
     createdAt: String!
   }
   input RegisterInput {
@@ -70,6 +79,7 @@ module.exports = gql`
       name: String!
       price: String!
       currency: String!
+      backgroundColor: String!
       image: String!
     ): Wish!
     deleteWish(wishId: ID!): String!

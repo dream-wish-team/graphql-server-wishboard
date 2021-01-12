@@ -4,7 +4,7 @@ const { UserInputError } = require('apollo-server');
 
 const {
   validateRegisterInput,
-  validateLoginInput
+  validateLoginInput,
 } = require('../../util/validators');
 const { SECRET_KEY } = require('../../config');
 const User = require('../../models/User');
@@ -14,7 +14,7 @@ function generateToken(user) {
     {
       id: user.id,
       email: user.email,
-      username: user.username
+      username: user.username,
     },
     SECRET_KEY,
     { expiresIn: '1h' }
@@ -48,14 +48,12 @@ module.exports = {
       return {
         ...user._doc,
         id: user._id,
-        token
+        token,
       };
     },
     async register(
       _,
-      {
-        registerInput: { username, email, password, confirmPassword }
-      }
+      { registerInput: { username, email, password, confirmPassword } }
     ) {
       const { valid, errors } = validateRegisterInput(
         username,
@@ -70,8 +68,8 @@ module.exports = {
       if (user) {
         throw new UserInputError('Username is taken', {
           errors: {
-            username: 'This username is taken'
-          }
+            username: 'This username is taken',
+          },
         });
       }
       password = await bcrypt.hash(password, 12);
@@ -79,8 +77,12 @@ module.exports = {
       const newUser = new User({
         email,
         username,
+        avatarSmall:
+          'https://cdn4.iconfinder.com/data/icons/avatars-xmas-giveaway/128/batman_hero_avatar_comics-512.png',
+        avatarBig:
+          'https://cdn4.iconfinder.com/data/icons/avatars-xmas-giveaway/128/batman_hero_avatar_comics-512.png',
         password,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       });
 
       const res = await newUser.save();
@@ -90,8 +92,8 @@ module.exports = {
       return {
         ...res._doc,
         id: res._id,
-        token
+        token,
       };
-    }
-  }
+    },
+  },
 };
