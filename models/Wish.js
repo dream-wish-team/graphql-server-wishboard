@@ -3,7 +3,6 @@ const { model, Schema } = require('mongoose');
 const wishSchema = new Schema({
   name: String,
   createdAt: String,
-  username: String,
   price: {
     value: Number,
     currency: String,
@@ -16,10 +15,15 @@ const wishSchema = new Schema({
     username: String,
     avatarSmall: String,
   },
+  description: String,
   image: {
     small: String,
+    normal: String,
   },
   backgroundColor: String,
+  visibilty: String,
+  originURL: String,
+  tags: [String],
   likes: [
     {
       username: String,
