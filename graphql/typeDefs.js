@@ -8,7 +8,11 @@ module.exports = gql`
     creator: TCreator!
     price: Price!
     image: Image!
+    description: String!
     backgroundColor: String!
+    visibilty: String!
+    tags: [String!]
+    originURL: String!
     active: [Active]!
     fulfilled: [Fulfilled]!
     comments: [Comment]!
@@ -31,6 +35,7 @@ module.exports = gql`
   }
   type Image {
     small: String!
+    normal: String!
   }
   type Like {
     id: ID!
@@ -58,15 +63,51 @@ module.exports = gql`
     email: String!
     token: String!
     username: String!
-    avatarSmall: String!
-    avatarBig: String!
+    avatar: Avatar
     createdAt: String!
+    personalData: PersonalData
+    socialNetworks: SocialNetworks
+    connectionsLists: ConnectionsLists
+    userWishes: UserWishes
+  }
+  type Avatar {
+    small: String!
+    normal: String!
+  }
+  type PersonalData {
+    name: String
+    surname: String
+    patronymic: String
+    dateOfBirth: String
+    hideDate: String
+    hideYear: Boolean
+  }
+  type SocialNetworks {
+    facebok: String
+    vk: String
+    odnoklassniki: String
+  }
+  type ConnectionsLists {
+    friends: [ID]
+    subscriptions: [ID]
+    subscribers: [ID]
+  }
+  type UserWishes {
+    active: [ID]
+    fulfilled: [ID]
+    liked: [ID]
+    created: [ID]
+    reserved: [Reserved]
+  }
+  type Reserved {
+    wish: ID
+    user: ID
   }
   input RegisterInput {
-    username: String!
-    password: String!
-    confirmPassword: String!
-    email: String!
+    username: String
+    password: String
+    confirmPassword: String
+    email: String
   }
   type Query {
     getWishes: [Wish]
