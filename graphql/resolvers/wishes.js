@@ -79,7 +79,7 @@ module.exports = {
       const user = checkAuth(context);
       try {
         const wish = await Wish.findById(wishId);
-        if (user.username === wish.username) {
+        if (user.username === wish.creator.username) {
           await wish.delete();
           return 'Wish deleted successfully';
         } else {
@@ -100,6 +100,69 @@ module.exports = {
           wish.likes.push({
             username,
             createdAt: new Date().toISOString(),
+          });
+        }
+
+        await wish.save();
+        return wish;
+      } else throw new UserInputError('Wish not found');
+    },
+    async activeWish(_, { wishId }, context) {
+      const { username } = checkAuth(context);
+      const wish = await Wish.findById(wishId);
+
+      if (wish) {
+        if (wish.active.find((like) => like.username === username)) {
+          wish.active = wish.active.filter(
+            (active) => active.username !== username
+          );
+        } else {
+          wish.active.push({
+            username,
+            createdAt: new Date().toISOString(),
+          });
+        }
+
+        await wish.save();
+        return wish;
+      } else throw new UserInputError('Wish not found');
+    },
+    async fulfilledWish(_, { wishId }, context) {
+      const { username } = checkAuth(context);
+      const wish = await Wish.findById(wishId);
+
+      if (wish) {
+        if (
+          wish.fulfilled.find((fulfilled) => fulfilled.username === username)
+        ) {
+          wish.fulfilled = wish.fulfilled.filter(
+            (fulfilled) => fulfilled.username !== username
+          );
+        } else {
+          wish.fulfilled.push({
+            username,
+            createdAt: new Date().toISOString(),
+          });
+        }
+
+        await wish.save();
+        return wish;
+      } else throw new UserInputError('Wish not found');
+    },
+    async commentsWish(_, { wishId, body }, context) {
+      const { username } = checkAuth(context);
+      const wish = await Wish.findById(wishId);
+
+      if (wish) {
+        if (wish.comments.find((comment) => comment.username === username)) {
+          wish.comments = wish.comments.filter(
+            (comment) => comment.username !== username
+          );
+        } else {
+          wish.comments.push({
+            username,
+            createdAt: new Date().toISOString(),
+            body: body,
           });
         }
 

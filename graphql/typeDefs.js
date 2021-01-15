@@ -79,7 +79,7 @@ module.exports = gql`
     surname: String
     patronymic: String
     dateOfBirth: String
-    hideDate: String
+    hideDate: Boolean
     hideYear: Boolean
   }
   type SocialNetworks {
@@ -116,6 +116,19 @@ module.exports = gql`
   type Mutation {
     register(registerInput: RegisterInput): User!
     login(username: String!, password: String!): User!
+    updateUser(
+      small: String
+      normal: String
+      name: String
+      surname: String
+      patronymic: String
+      dateOfBirth: String
+      hideDate: Boolean
+      hideYear: Boolean
+      facebok: String
+      vk: String
+      odnoklassniki: String
+    ): User!
     createWish(
       name: String!
       price: String!
@@ -127,6 +140,9 @@ module.exports = gql`
     createComment(wishId: ID!, body: String!): Wish!
     deleteComment(wishId: ID!, commentId: ID!): Wish!
     likeWish(wishId: ID!): Wish!
+    activeWish(wishId: ID!): Wish!
+    fulfilledWish(wishId: ID!): Wish!
+    commentsWish(wishId: ID!, body: String!): Wish!
   }
   type Subscription {
     newWish: Wish!
