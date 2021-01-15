@@ -8,6 +8,7 @@ const {
 } = require('../../util/validators');
 const { SECRET_KEY } = require('../../config');
 const User = require('../../models/User');
+const checkAuth = require('../../util/check-auth');
 
 function generateToken(user) {
   return jwt.sign(
@@ -77,10 +78,12 @@ module.exports = {
       const newUser = new User({
         email,
         username,
-        avatarSmall:
-          'https://cdn4.iconfinder.com/data/icons/avatars-xmas-giveaway/128/batman_hero_avatar_comics-512.png',
-        avatarBig:
-          'https://cdn4.iconfinder.com/data/icons/avatars-xmas-giveaway/128/batman_hero_avatar_comics-512.png',
+        avatar: {
+          small:
+            'https://cdn4.iconfinder.com/data/icons/avatars-xmas-giveaway/128/batman_hero_avatar_comics-512.png',
+          normal:
+            'https://cdn4.iconfinder.com/data/icons/avatars-xmas-giveaway/128/batman_hero_avatar_comics-512.png',
+        },
         password,
         createdAt: new Date().toISOString(),
       });
@@ -94,6 +97,64 @@ module.exports = {
         id: res._id,
         token,
       };
+    },
+    async updateUser(
+      _,
+      {
+        small,
+        normal,
+        name,
+        surname,
+        patronymic,
+        dateOfBirth,
+        hideDate,
+        hideYear,
+        facebok,
+        vk,
+        odnoklassniki,
+      },
+      context
+    ) {
+      const { id } = checkAuth(context);
+      const user = await User.findById(id);
+
+      if (user) {
+        if (small) {
+          user.avatar.small = small;
+        }
+        if (normal) {
+          user.avatar.normal = normal;
+        }
+        if (name) {
+          user.personalData.name = name;
+        }
+        if (surname) {
+          user.personalData.surname = surname;
+        }
+        if (patronymic) {
+          user.personalData.patronymic = patronymic;
+        }
+        if (dateOfBirth) {
+          user.personalData.dateOfBirth = dateOfBirth;
+        }
+        if (hideYear !== null) {
+          user.personalData.hideDate = hideDate;
+        }
+        if (hideYear !== null) {
+          user.personalData.hideYear = hideYear;
+        }
+        if (facebok) {
+          user.socialNetworks.facebok = facebok;
+        }
+        if (vk) {
+          user.socialNetworks.vk = vk;
+        }
+        if (odnoklassniki) {
+          user.socialNetworks.odnoklassniki = odnoklassniki;
+        }
+        await user.save();
+        return user;
+      } else throw new UserInputError('User not found');
     },
   },
 };
