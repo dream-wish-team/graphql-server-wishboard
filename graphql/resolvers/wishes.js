@@ -63,7 +63,9 @@ module.exports = {
         creator: {
           id: user.id,
           username: user.username,
-          avatarSmall: infoUser.avatarSmall,
+          avatar: {
+            small: infoUser.avatar.small,
+          },
         },
         createdAt: new Date().toISOString(),
       });

@@ -26,7 +26,7 @@ module.exports = gql`
   type TCreator {
     id: ID!
     username: String!
-    avatarSmall: String!
+    avatar: Avatar
   }
 
   type Price {
@@ -71,8 +71,8 @@ module.exports = gql`
     userWishes: UserWishes
   }
   type Avatar {
-    small: String!
-    normal: String!
+    small: String
+    normal: String
   }
   type PersonalData {
     name: String
