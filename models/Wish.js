@@ -13,7 +13,9 @@ const wishSchema = new Schema({
       ref: 'users',
     },
     username: String,
-    avatarSmall: String,
+    avatar: {
+      small: String,
+    },
   },
   description: String,
   image: {
