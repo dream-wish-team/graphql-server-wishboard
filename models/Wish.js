@@ -15,6 +15,7 @@ const wishSchema = new Schema({
     username: String,
     avatar: {
       small: String,
+      normal: String,
     },
   },
   description: String,
@@ -49,6 +50,17 @@ const wishSchema = new Schema({
       body: String,
       username: String,
       createdAt: String,
+      creator: {
+        id: {
+          type: Schema.Types.ObjectId,
+          ref: 'users',
+        },
+        username: String,
+        avatar: {
+          small: String,
+          normal: String,
+        },
+      },
     },
   ],
 });
