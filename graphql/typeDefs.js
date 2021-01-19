@@ -57,6 +57,7 @@ module.exports = gql`
     createdAt: String!
     username: String!
     body: String!
+    creator: TCreator!
   }
   type User {
     id: ID!
@@ -132,6 +133,9 @@ module.exports = gql`
     createWish(
       name: String!
       price: String!
+      originURL: String
+      description: String
+      visibilty: String
       currency: String!
       backgroundColor: String!
       image: String!
@@ -142,7 +146,6 @@ module.exports = gql`
     likeWish(wishId: ID!): Wish!
     activeWish(wishId: ID!): Wish!
     fulfilledWish(wishId: ID!): Wish!
-    commentsWish(wishId: ID!, body: String!): Wish!
   }
   type Subscription {
     newWish: Wish!

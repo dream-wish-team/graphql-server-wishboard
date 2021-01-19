@@ -30,7 +30,16 @@ module.exports = {
   Mutation: {
     async createWish(
       _,
-      { name, price, currency, backgroundColor, image },
+      {
+        name,
+        price,
+        currency,
+        backgroundColor,
+        originURL,
+        description,
+        visibilty,
+        image,
+      },
       context
     ) {
       const user = checkAuth(context);
@@ -58,13 +67,18 @@ module.exports = {
         },
         image: {
           small: image,
+          normal: image,
         },
         backgroundColor,
+        originURL,
+        description,
+        visibilty,
         creator: {
           id: user.id,
           username: user.username,
           avatar: {
             small: infoUser.avatar.small,
+            normal: infoUser.avatar.normal,
           },
         },
         createdAt: new Date().toISOString(),
@@ -151,10 +165,12 @@ module.exports = {
         return wish;
       } else throw new UserInputError('Wish not found');
     },
-    async commentsWish(_, { wishId, body }, context) {
-      const { username } = checkAuth(context);
+    async createComment(_, { wishId, body }, context) {
+      const { username, id } = checkAuth(context);
+      console.log(username);
       const wish = await Wish.findById(wishId);
-
+      const { avatar } = await User.findById(id);
+      console.log(avatar);
       if (wish) {
         if (wish.comments.find((comment) => comment.username === username)) {
           wish.comments = wish.comments.filter(
@@ -165,6 +181,9 @@ module.exports = {
             username,
             createdAt: new Date().toISOString(),
             body: body,
+            avatar: {
+              small: avatar.small,
+            },
           });
         }
 
