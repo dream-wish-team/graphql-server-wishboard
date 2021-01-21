@@ -6,19 +6,43 @@ const checkAuth = require('../../util/check-auth');
 
 module.exports = {
   Query: {
-    async getWishes() {
+    async getWishes(_, { name }) {
       try {
-        const wishs = await Wish.find().sort({ createdAt: -1 });
+        const wishs = await Wish.find({
+          name: { $regex: name, $options: 'i' },
+        });
         return wishs;
       } catch (err) {
         throw new Error(err);
       }
     },
-    async getWish(_, { wishId }) {
+    async getWish(_, { wishId, username }) {
       try {
         const wish = await Wish.findById(wishId);
         if (wish) {
+          wish.active = wish.active.filter(
+            (item) => item.user.username.toString() === username.toString()
+          );
           return wish;
+        } else {
+          throw new Error('Wish not found');
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+    async getWishByUserName(_, { username }, context) {
+      try {
+        const wishs = await Wish.find({});
+        const user = checkAuth(context);
+        if (wishs && user) {
+          const result = wishs.filter((item) =>
+            item.active.find(
+              (itemActive) =>
+                itemActive.user.username.toString() === username.toString()
+            )
+          );
+          return result;
         } else {
           throw new Error('Wish not found');
         }
@@ -37,7 +61,7 @@ module.exports = {
         backgroundColor,
         originURL,
         description,
-        visibilty,
+        visibility,
         image,
       },
       context
@@ -59,6 +83,7 @@ module.exports = {
       if (image.trim() === '') {
         throw new Error('Wish image must not be empty');
       }
+
       const newWish = new Wish({
         name,
         price: {
@@ -72,19 +97,23 @@ module.exports = {
         backgroundColor,
         originURL,
         description,
-        visibilty,
-        creator: {
-          id: user.id,
-          username: user.username,
-          avatar: {
-            small: infoUser.avatar.small,
-            normal: infoUser.avatar.normal,
+        active: [
+          {
+            createdAt: new Date().getTime(),
+            fulfilled: false,
+            visibility,
+            user: {
+              id: user.id,
+              username: user.username,
+              avatar: {
+                small: infoUser.avatar.small,
+                normal: infoUser.avatar.normal,
+              },
+            },
           },
-        },
-        createdAt: new Date().toISOString(),
+        ],
       });
       const wish = await newWish.save();
-
       context.pubsub.publish('NEW_WISH', {
         newWish: wish,
       });
@@ -95,7 +124,7 @@ module.exports = {
       const user = checkAuth(context);
       try {
         const wish = await Wish.findById(wishId);
-        if (user.username === wish.creator.username) {
+        if (user.username === wish.active[0].user.username) {
           await wish.delete();
           return 'Wish deleted successfully';
         } else {
@@ -106,16 +135,25 @@ module.exports = {
       }
     },
     async likeWish(_, { wishId }, context) {
-      const { username } = checkAuth(context);
-
+      const user = checkAuth(context);
+      const infoUser = await User.findById(user.id);
       const wish = await Wish.findById(wishId);
       if (wish) {
-        if (wish.likes.find((like) => like.username === username)) {
-          wish.likes = wish.likes.filter((like) => like.username !== username);
+        if (wish.likes.find((like) => like.user.username === user.username)) {
+          wish.likes = wish.likes.filter(
+            (like) => like.user.username !== user.username
+          );
         } else {
           wish.likes.push({
-            username,
-            createdAt: new Date().toISOString(),
+            createdAt: new Date().getTime(),
+            user: {
+              id: user.id,
+              username: user.username,
+              avatar: {
+                small: infoUser.avatar.small,
+                normal: infoUser.avatar.normal,
+              },
+            },
           });
         }
 
@@ -123,19 +161,38 @@ module.exports = {
         return wish;
       } else throw new UserInputError('Wish not found');
     },
-    async activeWish(_, { wishId }, context) {
-      const { username } = checkAuth(context);
+    async activeWish(_, { wishId, visibility }, context) {
+      const user = checkAuth(context);
+      const infoUser = await User.findById(user.id);
       const wish = await Wish.findById(wishId);
-
       if (wish) {
-        if (wish.active.find((like) => like.username === username)) {
-          wish.active = wish.active.filter(
-            (active) => active.username !== username
-          );
+        const activeIndex = wish.active.findIndex(
+          (item) => item.user.username === user.username
+        );
+        if (activeIndex !== -1) {
+          if (wish.active[activeIndex].fulfilled) {
+            wish.active[activeIndex].fulfilled = false;
+          } else {
+            const bufActive = wish.active.filter(
+              (item) => item.user.username !== user.username
+            );
+            if (bufActive.length !== 0) {
+              wish.active = bufActive;
+            }
+          }
         } else {
           wish.active.push({
-            username,
-            createdAt: new Date().toISOString(),
+            createdAt: new Date().getTime(),
+            fulfilled: false,
+            visibility,
+            user: {
+              id: user.id,
+              username: user.username,
+              avatar: {
+                small: infoUser.avatar.small,
+                normal: infoUser.avatar.normal,
+              },
+            },
           });
         }
 
@@ -143,46 +200,32 @@ module.exports = {
         return wish;
       } else throw new UserInputError('Wish not found');
     },
-    async fulfilledWish(_, { wishId }, context) {
-      const { username } = checkAuth(context);
+    async fulfilledWish(_, { wishId, visibility }, context) {
+      const user = checkAuth(context);
+      const infoUser = await User.findById(user.id);
       const wish = await Wish.findById(wishId);
-
       if (wish) {
-        if (
-          wish.fulfilled.find((fulfilled) => fulfilled.username === username)
-        ) {
-          wish.fulfilled = wish.fulfilled.filter(
-            (fulfilled) => fulfilled.username !== username
-          );
+        const activeIndex = wish.active.findIndex(
+          (item) => item.user.username === user.username
+        );
+        if (activeIndex !== -1) {
+          if (wish.active[activeIndex].fulfilled) {
+            wish.active[activeIndex].fulfilled = false;
+          } else {
+            wish.active[activeIndex].fulfilled = true;
+          }
         } else {
-          wish.fulfilled.push({
-            username,
-            createdAt: new Date().toISOString(),
-          });
-        }
-
-        await wish.save();
-        return wish;
-      } else throw new UserInputError('Wish not found');
-    },
-    async createComment(_, { wishId, body }, context) {
-      const { username, id } = checkAuth(context);
-      console.log(username);
-      const wish = await Wish.findById(wishId);
-      const { avatar } = await User.findById(id);
-      console.log(avatar);
-      if (wish) {
-        if (wish.comments.find((comment) => comment.username === username)) {
-          wish.comments = wish.comments.filter(
-            (comment) => comment.username !== username
-          );
-        } else {
-          wish.comments.push({
-            username,
-            createdAt: new Date().toISOString(),
-            body: body,
-            avatar: {
-              small: avatar.small,
+          wish.active.push({
+            createdAt: new Date().getTime(),
+            fulfilled: true,
+            visibility,
+            user: {
+              id: user.id,
+              username: user.username,
+              avatar: {
+                small: infoUser.avatar.small,
+                normal: infoUser.avatar.normal,
+              },
             },
           });
         }

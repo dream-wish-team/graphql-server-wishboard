@@ -6,9 +6,9 @@ const User = require('../../models/User');
 
 module.exports = {
   Mutation: {
-    createComment: async (_, { wishId, body }, context) => {
-      const { username, id } = checkAuth(context);
-      const infoUser = await User.findById(id);
+    createComment: async (_, { wishId, username, body }, context) => {
+      const user = checkAuth(context);
+      const infoUser = await User.findById(user.id);
       if (body.trim() === '') {
         throw new UserInputError('Empty comment', {
           errors: {
@@ -18,34 +18,51 @@ module.exports = {
       }
       const wish = await Wish.findById(wishId);
       if (wish) {
-        wish.comments.unshift({
-          body,
-          username,
-          createdAt: new Date().toISOString(),
-          creator: {
-            id: infoUser.id,
-            username: infoUser.username,
-            avatar: {
-              small: infoUser.avatar.small,
-              normal: infoUser.avatar.normal,
+        const activeIndex = wish.active.findIndex(
+          (item) => item.user.username === username
+        );
+        if (activeIndex !== -1) {
+          wish.active[activeIndex].comments.unshift({
+            body,
+            createdAt: new Date().getTime(),
+            user: {
+              id: infoUser.id,
+              username: user.username,
+              avatar: {
+                small: infoUser.avatar.small,
+                normal: infoUser.avatar.normal,
+              },
             },
-          },
-        });
+          });
+        } else throw new UserInputError('Username not found');
+
         await wish.save();
         return wish;
       } else throw new UserInputError('Wish not found');
     },
-    async deleteComment(_, { wishId, commentId }, context) {
-      const { username } = checkAuth(context);
+    async deleteComment(_, { wishId, username, commentId }, context) {
+      const user = checkAuth(context);
       const wish = await Wish.findById(wishId);
       if (wish) {
-        const commentIndex = wish.comments.findIndex((c) => c.id === commentId);
-        if (wish.comments[commentIndex].username === username) {
-          wish.comments.splice(commentIndex, 1);
-          await wish.save();
-          return wish;
+        const activeIndex = wish.active.findIndex(
+          (item) => item.user.username === username
+        );
+        if (activeIndex !== -1) {
+          const commentIndex = wish.active[activeIndex].comments.findIndex(
+            (c) => c.id === commentId
+          );
+          if (
+            wish.active[activeIndex].comments[commentIndex].user.username ===
+            user.username
+          ) {
+            wish.active[activeIndex].comments.splice(commentIndex, 1);
+            await wish.save();
+            return wish;
+          } else {
+            throw new AuthenticationError('Action not allowed');
+          }
         } else {
-          throw new AuthenticationError('Action not allowed');
+          throw new UserInputError('Username not found');
         }
       } else {
         throw new UserInputError('Wish not found');
