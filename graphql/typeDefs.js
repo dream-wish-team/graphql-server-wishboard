@@ -39,7 +39,7 @@ module.exports = gql`
   type Active {
     id: ID!
     createdAt: String!
-    visibility: String!
+    visibility: String
     fulfilled: Boolean!
     user: TUser!
     comments: [Comment]!
