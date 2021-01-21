@@ -43,30 +43,6 @@ const userSchema = new Schema({
     ],
   },
   userWishes: {
-    active: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'wishes',
-      },
-    ],
-    fulfilled: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'wishes',
-      },
-    ],
-    liked: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'wishes',
-      },
-    ],
-    created: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'wishes',
-      },
-    ],
     reserved: [
       {
         wish: {

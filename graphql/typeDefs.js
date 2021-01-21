@@ -4,26 +4,20 @@ module.exports = gql`
   type Wish {
     id: ID!
     name: String!
-    createdAt: String!
-    creator: TCreator!
     price: Price!
     image: Image!
     description: String!
     backgroundColor: String!
-    visibilty: String!
     tags: [String!]
     originURL: String!
     active: [Active]!
-    fulfilled: [Fulfilled]!
-    comments: [Comment]!
     likes: [Like]!
     likeCount: Int!
-    commentCount: Int!
     activeCount: Int!
     fulfilledCount: Int!
   }
 
-  type TCreator {
+  type TUser {
     id: ID!
     username: String!
     avatar: Avatar
@@ -40,24 +34,22 @@ module.exports = gql`
   type Like {
     id: ID!
     createdAt: String!
-    username: String!
+    user: TUser!
   }
   type Active {
     id: ID!
     createdAt: String!
-    username: String!
-  }
-  type Fulfilled {
-    id: ID!
-    createdAt: String!
-    username: String!
+    visibility: String!
+    fulfilled: Boolean!
+    user: TUser!
+    comments: [Comment]!
+    commentCount: Int!
   }
   type Comment {
     id: ID!
     createdAt: String!
-    username: String!
     body: String!
-    creator: TCreator!
+    user: TUser!
   }
   type User {
     id: ID!
@@ -94,10 +86,6 @@ module.exports = gql`
     subscribers: [ID]
   }
   type UserWishes {
-    active: [ID]
-    fulfilled: [ID]
-    liked: [ID]
-    created: [ID]
     reserved: [Reserved]
   }
   type Reserved {
@@ -111,8 +99,10 @@ module.exports = gql`
     email: String
   }
   type Query {
-    getWishes: [Wish]
-    getWish(wishId: ID!): Wish
+    getWishes(name: String): [Wish]
+    getWish(wishId: ID!, username: String!): Wish
+    getInfoUserByName(username: String!): User
+    getWishByUserName(username: String!): [Wish]
   }
   type Mutation {
     register(registerInput: RegisterInput): User!
@@ -135,17 +125,17 @@ module.exports = gql`
       price: String!
       originURL: String
       description: String
-      visibilty: String
+      visibility: String
       currency: String!
       backgroundColor: String!
       image: String!
     ): Wish!
     deleteWish(wishId: ID!): String!
-    createComment(wishId: ID!, body: String!): Wish!
-    deleteComment(wishId: ID!, commentId: ID!): Wish!
+    createComment(wishId: ID!, username: String!, body: String!): Wish!
+    deleteComment(wishId: ID!, username: String!, commentId: ID!): Wish!
     likeWish(wishId: ID!): Wish!
-    activeWish(wishId: ID!): Wish!
-    fulfilledWish(wishId: ID!): Wish!
+    activeWish(wishId: ID!, visibility: String): Wish!
+    fulfilledWish(wishId: ID!, visibility: String): Wish!
   }
   type Subscription {
     newWish: Wish!
