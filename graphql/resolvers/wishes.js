@@ -6,24 +6,68 @@ const checkAuth = require('../../util/check-auth');
 
 module.exports = {
   Query: {
-    async getWishes(_, { name }) {
+    async getWishes(_, { name, usernameGuest }) {
       try {
-        const wishs = await Wish.find({
-          name: { $regex: name, $options: 'i' },
-        });
-        return wishs;
+        if (usernameGuest) {
+          let wishs = await Wish.find({
+            name: { $regex: name, $options: 'i' },
+          });
+          wishs.forEach((item) => {
+            item.isLike = !!item.likes.find(
+              (like) => like.user.username === usernameGuest
+            );
+            item.isActive = !!item.active.find(
+              (itemActive) =>
+                itemActive.user.username === usernameGuest &&
+                !itemActive.fulfilled
+            );
+            item.isFulfilled = !!item.active.find(
+              (itemFulfilled) =>
+                itemFulfilled.user.username === usernameGuest &&
+                itemFulfilled.fulfilled
+            );
+          });
+          return wishs;
+        } else {
+          const wishs = await Wish.find({
+            name: { $regex: name, $options: 'i' },
+          });
+          return wishs;
+        }
       } catch (err) {
         throw new Error(err);
       }
     },
-    async getWish(_, { wishId, username }) {
+    async getWish(_, { wishId, usernameOwner, usernameGuest }) {
       try {
         const wish = await Wish.findById(wishId);
         if (wish) {
-          wish.active = wish.active.filter(
-            (item) => item.user.username.toString() === username.toString()
-          );
-          return wish;
+          if (usernameGuest) {
+            wish.isLike = !!wish.likes.find(
+              (like) => like.user.username === usernameGuest
+            );
+            wish.isActive = !!wish.active.find(
+              (itemActive) =>
+                itemActive.user.username === usernameGuest &&
+                !itemActive.fulfilled
+            );
+            wish.isFulfilled = !!wish.active.find(
+              (itemFulfilled) =>
+                itemFulfilled.user.username === usernameGuest &&
+                itemFulfilled.fulfilled
+            );
+            wish.active = wish.active.filter(
+              (item) =>
+                item.user.username.toString() === usernameOwner.toString()
+            );
+            return wish;
+          } else {
+            wish.active = wish.active.filter(
+              (item) =>
+                item.user.username.toString() === usernameOwner.toString()
+            );
+            return wish;
+          }
         } else {
           throw new Error('Wish not found');
         }
@@ -31,7 +75,7 @@ module.exports = {
         throw new Error(err);
       }
     },
-    async getWishByUserName(_, { username }, context) {
+    async getWishByUserName(_, { usernameOwner }, context) {
       try {
         const wishs = await Wish.find({});
         const user = checkAuth(context);
@@ -39,7 +83,7 @@ module.exports = {
           const result = wishs.filter((item) =>
             item.active.find(
               (itemActive) =>
-                itemActive.user.username.toString() === username.toString()
+                itemActive.user.username.toString() === usernameOwner.toString()
             )
           );
           return result;
@@ -97,6 +141,9 @@ module.exports = {
         backgroundColor,
         originURL,
         description,
+        likeCount: 0,
+        activeCount: 1,
+        fulfilledCount: 0,
         active: [
           {
             createdAt: new Date().getTime(),
@@ -143,6 +190,8 @@ module.exports = {
           wish.likes = wish.likes.filter(
             (like) => like.user.username !== user.username
           );
+          wish.likeCount = wish.likeCount - 1;
+          wish.isLike = false;
         } else {
           wish.likes.push({
             createdAt: new Date().getTime(),
@@ -155,6 +204,8 @@ module.exports = {
               },
             },
           });
+          wish.likeCount = wish.likeCount + 1;
+          wish.isLike = true;
         }
 
         await wish.save();
@@ -171,13 +222,21 @@ module.exports = {
         );
         if (activeIndex !== -1) {
           if (wish.active[activeIndex].fulfilled) {
+            wish.visibility = visibility;
             wish.active[activeIndex].fulfilled = false;
+            wish.fulfilledCount = wish.fulfilledCount - 1;
+            wish.activeCount = wish.activeCount + 1;
+            wish.isActive = true;
+            wish.isFulfilled = false;
           } else {
             const bufActive = wish.active.filter(
               (item) => item.user.username !== user.username
             );
             if (bufActive.length !== 0) {
+              wish.visibility = visibility;
               wish.active = bufActive;
+              wish.activeCount = wish.activeCount - 1;
+              wish.isActive = false;
             }
           }
         } else {
@@ -194,6 +253,8 @@ module.exports = {
               },
             },
           });
+          wish.activeCount = wish.activeCount + 1;
+          wish.isActive = true;
         }
 
         await wish.save();
@@ -210,9 +271,19 @@ module.exports = {
         );
         if (activeIndex !== -1) {
           if (wish.active[activeIndex].fulfilled) {
+            wish.visibility = visibility;
             wish.active[activeIndex].fulfilled = false;
+            wish.fulfilledCount = wish.fulfilledCount - 1;
+            wish.activeCount = wish.activeCount + 1;
+            wish.isActive = true;
+            wish.isFulfilled = false;
           } else {
             wish.active[activeIndex].fulfilled = true;
+            wish.visibility = visibility;
+            wish.fulfilledCount = wish.fulfilledCount + 1;
+            wish.activeCount = wish.activeCount - 1;
+            wish.isActive = false;
+            wish.isFulfilled = true;
           }
         } else {
           wish.active.push({
@@ -228,6 +299,8 @@ module.exports = {
               },
             },
           });
+          wish.fulfilledCount = wish.fulfilledCount + 1;
+          wish.isFulfilled = true;
         }
 
         await wish.save();

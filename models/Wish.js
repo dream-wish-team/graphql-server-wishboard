@@ -65,6 +65,9 @@ const wishSchema = new Schema({
       ],
     },
   ],
+  likeCount: Number,
+  activeCount: Number,
+  fulfilledCount: Number,
 });
 
 module.exports = model('Wish', wishSchema);
