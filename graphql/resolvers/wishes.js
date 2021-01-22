@@ -237,7 +237,7 @@ module.exports = {
               wish.active = bufActive;
               wish.activeCount = wish.activeCount - 1;
               wish.isActive = false;
-              wish.isFulfilled = true;
+              wish.isFulfilled = false;
             } else {
               wish.isActive = true;
               wish.isFulfilled = false;
