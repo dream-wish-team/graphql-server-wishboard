@@ -15,6 +15,9 @@ module.exports = gql`
     likeCount: Int!
     activeCount: Int!
     fulfilledCount: Int!
+    isLike: Boolean
+    isActive: Boolean
+    isFulfilled: Boolean
   }
 
   type TUser {
@@ -99,10 +102,10 @@ module.exports = gql`
     email: String
   }
   type Query {
-    getWishes(name: String): [Wish]
-    getWish(wishId: ID!, username: String!): Wish
+    getWishes(name: String, usernameGuest: String): [Wish]
+    getWish(wishId: ID!, usernameOwner: String!, usernameGuest: String): Wish
     getInfoUserByName(username: String!): User
-    getWishByUserName(username: String!): [Wish]
+    getWishByUserName(usernameOwner: String!): [Wish]
   }
   type Mutation {
     register(registerInput: RegisterInput): User!
