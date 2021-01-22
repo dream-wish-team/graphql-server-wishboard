@@ -237,6 +237,10 @@ module.exports = {
               wish.active = bufActive;
               wish.activeCount = wish.activeCount - 1;
               wish.isActive = false;
+              wish.isFulfilled = true;
+            } else {
+              wish.isActive = true;
+              wish.isFulfilled = false;
             }
           }
         } else {
@@ -255,8 +259,8 @@ module.exports = {
           });
           wish.activeCount = wish.activeCount + 1;
           wish.isActive = true;
+          wish.isFulfilled = false;
         }
-
         await wish.save();
         return wish;
       } else throw new UserInputError('Wish not found');
