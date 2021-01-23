@@ -76,17 +76,70 @@ module.exports = {
       }
     },
     async getWishByUserName(_, { usernameOwner }, context) {
+      const user = checkAuth(context);
       try {
-        const wishs = await Wish.find({});
-        const user = checkAuth(context);
-        if (wishs && user) {
-          const result = wishs.filter((item) =>
+        const wishes = await Wish.find({});
+        if (wishes) {
+          const results = wishes.filter((item) =>
             item.active.find(
               (itemActive) =>
                 itemActive.user.username.toString() === usernameOwner.toString()
             )
           );
-          return result;
+          results.forEach((item) => {
+            item.isLike = !!item.likes.find(
+              (like) => like.user.username === user.username
+            );
+            item.isActive = !!item.active.find(
+              (itemActive) =>
+                itemActive.user.username === user.username &&
+                !itemActive.fulfilled
+            );
+            item.isFulfilled = !!item.active.find(
+              (itemFulfilled) =>
+                itemFulfilled.user.username === user.username &&
+                itemFulfilled.fulfilled
+            );
+          });
+          return results;
+        } else {
+          throw new Error('Wish not found');
+        }
+      } catch (err) {
+        throw new Error(err);
+      }
+    },
+    async getInfoUserByName(_, { usernameOwner }, context) {
+      const user = checkAuth(context);
+      try {
+        const wishes = await Wish.find({});
+        const userInfo = await User.findOne({
+          username: { $regex: usernameOwner, $options: 'i' },
+        });
+        if (wishes && user) {
+          const results = wishes.filter((item) =>
+            item.active.find(
+              (itemActive) =>
+                itemActive.user.username.toString() === usernameOwner.toString()
+            )
+          );
+          results.forEach((item) => {
+            item.isLike = !!item.likes.find(
+              (like) => like.user.username === user.username
+            );
+            item.isActive = !!item.active.find(
+              (itemActive) =>
+                itemActive.user.username === user.username &&
+                !itemActive.fulfilled
+            );
+            item.isFulfilled = !!item.active.find(
+              (itemFulfilled) =>
+                itemFulfilled.user.username === user.username &&
+                itemFulfilled.fulfilled
+            );
+          });
+
+          return { wishes: results, user: userInfo };
         } else {
           throw new Error('Wish not found');
         }

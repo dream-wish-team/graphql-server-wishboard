@@ -8,6 +8,7 @@ const {
 } = require('../../util/validators');
 const { SECRET_KEY } = require('../../config');
 const User = require('../../models/User');
+const Wish = require('../../models/Wish');
 const checkAuth = require('../../util/check-auth');
 
 function generateToken(user) {
@@ -23,19 +24,6 @@ function generateToken(user) {
 }
 
 module.exports = {
-  Query: {
-    async getInfoUserByName(_, { username }, context) {
-      try {
-        checkAuth(context);
-        const user = await User.findOne({
-          username: { $regex: username, $options: 'i' },
-        });
-        return user;
-      } catch (err) {
-        throw new Error(err);
-      }
-    },
-  },
   Mutation: {
     async login(_, { username, password }) {
       const { errors, valid } = validateLoginInput(username, password);

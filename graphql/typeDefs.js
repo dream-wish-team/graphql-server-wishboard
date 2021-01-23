@@ -1,6 +1,11 @@
 const { gql } = require('apollo-server');
 
 module.exports = gql`
+  type WishUser {
+    wishes: [Wish]!
+    user: User!
+  }
+
   type Wish {
     id: ID!
     name: String!
@@ -104,8 +109,8 @@ module.exports = gql`
   type Query {
     getWishes(name: String, usernameGuest: String): [Wish]
     getWish(wishId: ID!, usernameOwner: String!, usernameGuest: String): Wish
-    getInfoUserByName(username: String!): User
-    getWishByUserName(usernameOwner: String!): [Wish]
+    getInfoUserByName(usernameOwner: String!): WishUser!
+    getWishByUserName(usernameOwner: String!): [Wish]!
   }
   type Mutation {
     register(registerInput: RegisterInput): User!
