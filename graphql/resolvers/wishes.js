@@ -26,6 +26,7 @@ module.exports = {
                 itemFulfilled.user.username === usernameGuest &&
                 itemFulfilled.fulfilled
             );
+            item.active = item.active.slice(0, 1);
           });
           return wishs;
         } else {
@@ -145,7 +146,10 @@ module.exports = {
             );
           });
 
-          return { wishes: results, user: userInfo };
+          return {
+            wishes: results,
+            user: userInfo,
+          };
         } else {
           throw new Error('Wish not found');
         }
