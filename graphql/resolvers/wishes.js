@@ -131,9 +131,6 @@ module.exports = {
             item.isLike = !!item.likes.find(
               (like) => like.user.username === user.username
             );
-            item.active = item.active.filter(
-              (ac) => ac.user.username.toString() === usernameOwner.toString()
-            );
             item.isActive = !!item.active.find(
               (itemActive) =>
                 itemActive.user.username === user.username &&
@@ -143,6 +140,9 @@ module.exports = {
               (itemFulfilled) =>
                 itemFulfilled.user.username === user.username &&
                 itemFulfilled.fulfilled
+            );
+            item.active = item.active.filter(
+              (ac) => ac.user.username.toString() === usernameOwner.toString()
             );
           });
 
