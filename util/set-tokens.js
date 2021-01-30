@@ -6,7 +6,7 @@ module.exports.setTokens = (user) => {
   const sevenDays = 60 * 60 * 24 * 7;
   const fifteenMins = 60 * 15;
 
-  // const sevenDays = 10000;
+  // const sevenDays = 10;
   // const fifteenMins = 5;
   const accessUser = {
     id: user.id,

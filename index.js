@@ -19,13 +19,11 @@ const apolloServer = new ApolloServer({
 });
 
 const whitelist = [
-  'https://test-server-skaymant.netlify.app/',
   'http://localhost:8080',
   'https://dream-team-wishboard.netlify.app/',
 ];
 
 const whitelistProduction = [
-  'https://test-server-skaymant.netlify.app/',
   'http://localhost:8080',
   'https://dream-team-wishboard.netlify.app/',
 ];
