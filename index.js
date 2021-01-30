@@ -17,14 +17,37 @@ const apolloServer = new ApolloServer({
   context: ({ req, res }) => ({ req, res }),
   cors: false,
 });
+
+const whitelist = [
+  'http://localhost:8080',
+  'https://dream-team-wishboard.netlify.app/',
+];
+
+const whitelistProduction = [
+  'http://localhost:8080',
+  'https://dream-team-wishboard.netlify.app/',
+];
+
 const corsConfig =
   process.env.NODE_ENV !== 'production'
     ? {
-        origin: 'http://localhost:8080',
+        origin: (origin, callback) => {
+          if (whitelistProduction.indexOf(origin) !== -1) {
+            callback(null, true);
+          } else {
+            callback(new Error('Not allowed by CORS'));
+          }
+        },
         credentials: true,
       }
     : {
-        origin: 'https://dream-team-wishboard.netlify.app/',
+        origin: (origin, callback) => {
+          if (whitelist.indexOf(origin) !== -1) {
+            callback(null, true);
+          } else {
+            callback(new Error('Not allowed by CORS'));
+          }
+        },
         credentials: true,
       };
 const app = express();
