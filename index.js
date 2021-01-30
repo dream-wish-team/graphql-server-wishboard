@@ -24,7 +24,7 @@ const corsConfig =
         credentials: true,
       }
     : {
-        origin: 'https://dream-team-wishboard.netlify.app/',
+        origin: 'http://localhost:8080',
         credentials: true,
       };
 const app = express();
