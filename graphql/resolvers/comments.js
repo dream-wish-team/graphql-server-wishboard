@@ -63,7 +63,7 @@ module.exports = {
             throw new AuthenticationError('Action not allowed');
           }
         } else {
-          throw new UserInputError('usernameOwner not found');
+          throw new UserInputError('UsernameOwner not found');
         }
       } else {
         throw new UserInputError('Wish not found');
