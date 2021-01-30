@@ -1,28 +1,48 @@
-const { ApolloServer, PubSub } = require('apollo-server');
+const { ApolloServer } = require('apollo-server-express');
+const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const typeDefs = require('./graphql/typeDefs');
 const resolvers = require('./graphql/resolvers');
+const validateTokensMiddleware = require('./graphql/middleware/validate-tokens-middleware');
 const { MONGODB } = require('./config.js');
-
-const pubsub = new PubSub();
 
 const PORT = process.env.PORT || 5000;
 
-const server = new ApolloServer({
+const apolloServer = new ApolloServer({
   typeDefs,
   resolvers,
-  context: ({ req }) => ({ req, pubsub }),
+  context: ({ req, res }) => ({ req, res }),
+  cors: false,
 });
+const corsConfig =
+  process.env.NODE_ENV !== 'production'
+    ? {
+        origin: 'http://localhost:8080',
+        credentials: true,
+      }
+    : {
+        origin: 'process.env.PORT',
+        credentials: true,
+      };
+const app = express();
+app.use(cors(corsConfig));
+app.use(cookieParser());
+app.use(validateTokensMiddleware);
+apolloServer.applyMiddleware({ app, cors: false });
 
 mongoose
   .connect(MONGODB, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     console.log('MongoDB Connected');
-    return server.listen({ port: PORT });
+    return app.listen({ port: PORT });
   })
   .then((res) => {
-    console.log(`Server running at ${res.url}`);
+    console.log(
+      `🚀 Server ready at http://localhost:${PORT}${apolloServer.graphqlPath}`
+    );
   })
   .catch((err) => {
     console.error(err);

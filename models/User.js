@@ -5,6 +5,7 @@ const userSchema = new Schema({
   password: String,
   email: String,
   createdAt: String,
+  tokenCount: Number,
   avatar: {
     small: String,
     normal: String,
@@ -18,7 +19,7 @@ const userSchema = new Schema({
     hideYear: Boolean,
   },
   socialNetworks: {
-    facebok: String,
+    facebook: String,
     vk: String,
     odnoklassniki: String,
   },

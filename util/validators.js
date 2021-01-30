@@ -1,3 +1,6 @@
+const { SECRET_KEY_ACCESS, SECRET_KEY_REFRESH } = require('../config');
+const { verify } = require('jsonwebtoken');
+
 module.exports.validateRegisterInput = (
   username,
   email,
@@ -24,7 +27,7 @@ module.exports.validateRegisterInput = (
 
   return {
     errors,
-    valid: Object.keys(errors).length < 1
+    valid: Object.keys(errors).length < 1,
   };
 };
 
@@ -39,6 +42,22 @@ module.exports.validateLoginInput = (username, password) => {
 
   return {
     errors,
-    valid: Object.keys(errors).length < 1
+    valid: Object.keys(errors).length < 1,
   };
+};
+
+module.exports.validateAccessToken = (token) => {
+  try {
+    return verify(token, SECRET_KEY_ACCESS);
+  } catch {
+    return null;
+  }
+};
+
+module.exports.validateRefreshToken = (token) => {
+  try {
+    return verify(token, SECRET_KEY_REFRESH);
+  } catch {
+    return null;
+  }
 };

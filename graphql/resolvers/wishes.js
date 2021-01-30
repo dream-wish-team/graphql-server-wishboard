@@ -76,43 +76,6 @@ module.exports = {
         throw new Error(err);
       }
     },
-    async getWishByUserName(_, { usernameOwner }, context) {
-      const user = checkAuth(context);
-      try {
-        const wishes = await Wish.find({});
-        if (wishes) {
-          const results = wishes.filter((item) =>
-            item.active.find(
-              (itemActive) =>
-                itemActive.user.username.toString() === usernameOwner.toString()
-            )
-          );
-          results.forEach((item) => {
-            item.isLike = !!item.likes.find(
-              (like) => like.user.username === user.username
-            );
-            item.active = item.active.filter(
-              (ac) => ac.user.username.toString() === usernameOwner.toString()
-            );
-            item.isActive = !!item.active.find(
-              (itemActive) =>
-                itemActive.user.username === user.username &&
-                !itemActive.fulfilled
-            );
-            item.isFulfilled = !!item.active.find(
-              (itemFulfilled) =>
-                itemFulfilled.user.username === user.username &&
-                itemFulfilled.fulfilled
-            );
-          });
-          return results;
-        } else {
-          throw new Error('Wish not found');
-        }
-      } catch (err) {
-        throw new Error(err);
-      }
-    },
     async getInfoUserByName(_, { usernameOwner }, context) {
       const user = checkAuth(context);
       try {
