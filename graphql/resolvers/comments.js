@@ -6,7 +6,7 @@ const User = require('../../models/User');
 
 module.exports = {
   Mutation: {
-    createComment: async (_, { wishId, username, body }, context) => {
+    createComment: async (_, { wishId, usernameOwner, body }, context) => {
       const user = checkAuth(context);
       const infoUser = await User.findById(user.id);
       if (body.trim() === '') {
@@ -19,7 +19,7 @@ module.exports = {
       const wish = await Wish.findById(wishId);
       if (wish) {
         const activeIndex = wish.active.findIndex(
-          (item) => item.user.username === username
+          (item) => item.user.username === usernameOwner
         );
         if (activeIndex !== -1) {
           wish.active[activeIndex].comments.unshift({
@@ -40,12 +40,13 @@ module.exports = {
         return wish;
       } else throw new UserInputError('Wish not found');
     },
-    async deleteComment(_, { wishId, username, commentId }, context) {
+    async deleteComment(_, { wishId, usernameOwner, commentId }, context) {
       const user = checkAuth(context);
       const wish = await Wish.findById(wishId);
+
       if (wish) {
         const activeIndex = wish.active.findIndex(
-          (item) => item.user.username === username
+          (item) => item.user.username === usernameOwner
         );
         if (activeIndex !== -1) {
           const commentIndex = wish.active[activeIndex].comments.findIndex(
@@ -62,7 +63,7 @@ module.exports = {
             throw new AuthenticationError('Action not allowed');
           }
         } else {
-          throw new UserInputError('Username not found');
+          throw new UserInputError('UsernameOwner not found');
         }
       } else {
         throw new UserInputError('Wish not found');

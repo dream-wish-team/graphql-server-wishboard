@@ -6,26 +6,15 @@ const {
   validateRegisterInput,
   validateLoginInput,
 } = require('../../util/validators');
-const { SECRET_KEY } = require('../../config');
-const User = require('../../models/User');
-const Wish = require('../../models/Wish');
-const checkAuth = require('../../util/check-auth');
 
-function generateToken(user) {
-  return jwt.sign(
-    {
-      id: user.id,
-      email: user.email,
-      username: user.username,
-    },
-    SECRET_KEY,
-    { expiresIn: '78h' }
-  );
-}
+const { setTokens, tokenCookies } = require('../../util/set-tokens');
+const User = require('../../models/User');
+
+const checkAuth = require('../../util/check-auth');
 
 module.exports = {
   Mutation: {
-    async login(_, { username, password }) {
+    async login(_, { username, password }, context) {
       const { errors, valid } = validateLoginInput(username, password);
 
       if (!valid) {
@@ -45,13 +34,20 @@ module.exports = {
         throw new UserInputError('Wrong crendetials', { errors });
       }
 
-      const token = generateToken(user);
+      const tokens = setTokens(user);
+      const cookies = tokenCookies(tokens);
+      context.res.cookie(...cookies.access);
+      context.res.cookie(...cookies.refresh);
 
       return {
         ...user._doc,
         id: user._id,
-        token,
       };
+    },
+    async logout(_, __, { res }) {
+      res.clearCookie('access');
+      res.clearCookie('refresh');
+      return true;
     },
     async register(
       _,
@@ -84,17 +80,15 @@ module.exports = {
           normal: '',
         },
         password,
+        tokenCount: 0,
         createdAt: new Date().toISOString(),
       });
 
       const res = await newUser.save();
 
-      const token = generateToken(res);
-
       return {
         ...res._doc,
         id: res._id,
-        token,
       };
     },
     async updateUser(
@@ -108,13 +102,14 @@ module.exports = {
         dateOfBirth,
         hideDate,
         hideYear,
-        facebok,
+        facebook,
         vk,
         odnoklassniki,
       },
       context
     ) {
       const { id } = checkAuth(context);
+
       const user = await User.findById(id);
 
       if (user) {
@@ -142,8 +137,8 @@ module.exports = {
         if (hideYear !== null) {
           user.personalData.hideYear = hideYear;
         }
-        if (facebok) {
-          user.socialNetworks.facebok = facebok;
+        if (facebook) {
+          user.socialNetworks.facebook = facebook;
         }
         if (vk) {
           user.socialNetworks.vk = vk;
@@ -151,6 +146,7 @@ module.exports = {
         if (odnoklassniki) {
           user.socialNetworks.odnoklassniki = odnoklassniki;
         }
+        user.tokenCount = 0;
         await user.save();
         return user;
       } else throw new UserInputError('User not found');

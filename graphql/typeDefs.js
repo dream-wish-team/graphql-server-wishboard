@@ -59,11 +59,12 @@ module.exports = gql`
     body: String!
     user: TUser!
   }
+
   type User {
     id: ID!
     email: String!
-    token: String!
     username: String!
+    tokenCount: Int
     avatar: Avatar
     createdAt: String!
     personalData: PersonalData
@@ -84,7 +85,7 @@ module.exports = gql`
     hideYear: Boolean
   }
   type SocialNetworks {
-    facebok: String
+    facebook: String
     vk: String
     odnoklassniki: String
   }
@@ -110,11 +111,11 @@ module.exports = gql`
     getWishes(name: String, usernameGuest: String): [Wish]
     getWish(wishId: ID!, usernameOwner: String!, usernameGuest: String): Wish
     getInfoUserByName(usernameOwner: String!): WishUser!
-    getWishByUserName(usernameOwner: String!): [Wish]!
   }
   type Mutation {
     register(registerInput: RegisterInput): User!
     login(username: String!, password: String!): User!
+    logout: Boolean!
     updateUser(
       small: String
       normal: String
@@ -124,7 +125,7 @@ module.exports = gql`
       dateOfBirth: String
       hideDate: Boolean
       hideYear: Boolean
-      facebok: String
+      facebook: String
       vk: String
       odnoklassniki: String
     ): User!
@@ -139,8 +140,8 @@ module.exports = gql`
       image: String!
     ): Wish!
     deleteWish(wishId: ID!): String!
-    createComment(wishId: ID!, username: String!, body: String!): Wish!
-    deleteComment(wishId: ID!, username: String!, commentId: ID!): Wish!
+    createComment(wishId: ID!, usernameOwner: String!, body: String!): Wish!
+    deleteComment(wishId: ID!, usernameOwner: String!, commentId: ID!): Wish!
     likeWish(wishId: ID!): Wish!
     activeWish(wishId: ID!, visibility: String): Wish!
     fulfilledWish(wishId: ID!, visibility: String): Wish!
