@@ -24,7 +24,7 @@ const corsConfig =
         credentials: true,
       }
     : {
-        origin: 'process.env.PORT',
+        origin: 'https://dream-team-wishboard.netlify.app/',
         credentials: true,
       };
 const app = express();
