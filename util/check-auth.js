@@ -5,6 +5,7 @@ const { SECRET_KEY_ACCESS } = require('../config');
 
 module.exports = (context) => {
   const accessToken = context.req.cookies['access'];
+  console.log('check-auth accessToken', accessToken);
   if (accessToken) {
     try {
       const { user } = jwt.verify(accessToken, SECRET_KEY_ACCESS);

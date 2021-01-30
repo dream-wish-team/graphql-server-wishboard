@@ -9,7 +9,7 @@ const {
 
 const { setTokens, tokenCookies } = require('../../util/set-tokens');
 const User = require('../../models/User');
-const Wish = require('../../models/Wish');
+
 const checkAuth = require('../../util/check-auth');
 
 module.exports = {
