@@ -32,6 +32,8 @@ module.exports.setTokens = (user) => {
 module.exports.tokenCookies = ({ accessToken, refreshToken }) => {
   const cookieOptions = {
     httpOnly: true,
+    // secure: true,
+    // SameSite: None,
   };
   return {
     access: ['access', accessToken, cookieOptions],
