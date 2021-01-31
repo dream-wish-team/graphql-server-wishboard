@@ -8,7 +8,7 @@ const { setTokens, tokenCookies } = require('../../util/set-tokens');
 module.exports = async function validateTokensMiddleware(req, res, next) {
   const refreshToken = req.cookies['refresh'];
   const accessToken = req.cookies['access'];
-  console.log('validateTokensMiddleware accessToken', accessToken);
+  // console.log('validateTokensMiddleware accessToken', accessToken);
   if (!accessToken && !refreshToken) return next();
   const decodedAccessToken = validateAccessToken(accessToken);
   if (decodedAccessToken && decodedAccessToken.user) {

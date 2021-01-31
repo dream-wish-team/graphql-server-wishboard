@@ -26,20 +26,32 @@ const userSchema = new Schema({
   connectionsLists: {
     friends: [
       {
-        type: Schema.Types.ObjectId,
-        ref: 'users',
+        username: String,
+        birthday: String,
+        avatar: {
+          small: String,
+          normal: String,
+        },
       },
     ],
     subscriptions: [
       {
-        type: Schema.Types.ObjectId,
-        ref: 'users',
+        username: String,
+        birthday: String,
+        avatar: {
+          small: String,
+          normal: String,
+        },
       },
     ],
     subscribers: [
       {
-        type: Schema.Types.ObjectId,
-        ref: 'users',
+        username: String,
+        birthday: String,
+        avatar: {
+          small: String,
+          normal: String,
+        },
       },
     ],
   },

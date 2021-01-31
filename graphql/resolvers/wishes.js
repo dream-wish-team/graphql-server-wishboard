@@ -9,10 +9,10 @@ module.exports = {
     async getWishes(_, { name, usernameGuest }) {
       try {
         if (usernameGuest) {
-          let wishs = await Wish.find({
+          let wishes = await Wish.find({
             name: { $regex: name, $options: 'i' },
           });
-          wishs.forEach((item) => {
+          wishes.forEach((item) => {
             item.isLike = !!item.likes.find(
               (like) => like.user.username === usernameGuest
             );
@@ -28,12 +28,12 @@ module.exports = {
             );
             item.active = item.active.slice(0, 1);
           });
-          return wishs;
+          return wishes;
         } else {
-          const wishs = await Wish.find({
+          const wishes = await Wish.find({
             name: { $regex: name, $options: 'i' },
           });
-          return wishs;
+          return wishes;
         }
       } catch (err) {
         throw new Error(err);
@@ -187,9 +187,6 @@ module.exports = {
         ],
       });
       const wish = await newWish.save();
-      context.pubsub.publish('NEW_WISH', {
-        newWish: wish,
-      });
 
       return wish;
     },

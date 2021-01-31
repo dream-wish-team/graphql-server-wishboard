@@ -90,9 +90,15 @@ module.exports = gql`
     odnoklassniki: String
   }
   type ConnectionsLists {
-    friends: [ID]
-    subscriptions: [ID]
-    subscribers: [ID]
+    friends: [Friend]
+    subscriptions: [Friend]
+    subscribers: [Friend]
+  }
+  type Friend {
+    id: ID!
+    username: String!
+    birthday: String
+    avatar: Avatar!
   }
   type UserWishes {
     reserved: [Reserved]
@@ -111,6 +117,9 @@ module.exports = gql`
     getWishes(name: String, usernameGuest: String): [Wish]
     getWish(wishId: ID!, usernameOwner: String!, usernameGuest: String): Wish
     getInfoUserByName(usernameOwner: String!): WishUser!
+    getFriends(name: String, usernameOwner: String!): [Friend]
+    getSubscribers(name: String, usernameOwner: String!): [Friend]
+    getSubscriptions(name: String, usernameOwner: String!): [Friend]
   }
   type Mutation {
     register(registerInput: RegisterInput): User!
@@ -145,6 +154,7 @@ module.exports = gql`
     likeWish(wishId: ID!): Wish!
     activeWish(wishId: ID!, visibility: String): Wish!
     fulfilledWish(wishId: ID!, visibility: String): Wish!
+    subscribeUser(subscriptionUsername: String!): [User]
   }
   type Subscription {
     newWish: Wish!
