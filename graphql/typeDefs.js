@@ -99,6 +99,7 @@ module.exports = gql`
     username: String!
     birthday: String
     avatar: Avatar!
+    isFriend: Boolean!
   }
   type UserWishes {
     reserved: [Reserved]
@@ -154,7 +155,7 @@ module.exports = gql`
     likeWish(wishId: ID!): Wish!
     activeWish(wishId: ID!, visibility: String): Wish!
     fulfilledWish(wishId: ID!, visibility: String): Wish!
-    subscribeUser(subscriptionUsername: String!): [User]
+    subscribeUser(subscriptionUsername: String!): [Friend]
   }
   type Subscription {
     newWish: Wish!
