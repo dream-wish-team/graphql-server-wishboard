@@ -11,9 +11,21 @@ module.exports = {
         const userInfo = await User.findOne({
           username: { $regex: usernameOwner, $options: 'i' },
         });
+        const subscriberUser = await User.findById(user.id);
         let friends = userInfo.connectionsLists.friends.filter(
           (item) => item.username.indexOf(name) !== -1
         );
+        friends = friends.map((elem) => {
+          return {
+            id: elem.id,
+            username: elem.username,
+            birthday: elem.birthday,
+            avatar: elem.avatar,
+            isFriend: !!subscriberUser.connectionsLists.friends.find(
+              (item) => elem.username === item.username
+            ),
+          };
+        });
         return friends;
       } catch (err) {
         throw new Error(err);
@@ -25,9 +37,21 @@ module.exports = {
         const userInfo = await User.findOne({
           username: { $regex: usernameOwner, $options: 'i' },
         });
+        const subscriberUser = await User.findById(user.id);
         let subscribers = userInfo.connectionsLists.subscribers.filter(
           (item) => item.username.indexOf(name) !== -1
         );
+        subscribers = subscribers.map((elem) => {
+          return {
+            id: elem.id,
+            username: elem.username,
+            birthday: elem.birthday,
+            avatar: elem.avatar,
+            isFriend: !!subscriberUser.connectionsLists.friends.find(
+              (item) => elem.username === item.username
+            ),
+          };
+        });
         return subscribers;
       } catch (err) {
         throw new Error(err);
@@ -39,9 +63,21 @@ module.exports = {
         const userInfo = await User.findOne({
           username: { $regex: usernameOwner, $options: 'i' },
         });
+        const subscriberUser = await User.findById(user.id);
         let subscriptions = userInfo.connectionsLists.subscriptions.filter(
           (item) => item.username.indexOf(name) !== -1
         );
+        subscriptions = subscriptions.map((elem) => {
+          return {
+            id: elem.id,
+            username: elem.username,
+            birthday: elem.birthday,
+            avatar: elem.avatar,
+            isFriend: !!subscriberUser.connectionsLists.friends.find(
+              (item) => elem.username === item.username
+            ),
+          };
+        });
         return subscriptions;
       } catch (err) {
         throw new Error(err);
@@ -116,7 +152,7 @@ module.exports = {
         }
         await subscriptionUser.save();
         await subscriberUser.save();
-        return [subscriptionUser, subscriberUser];
+        return subscriptionUser.connectionsLists.subscribers;
       } else
         throw new UserInputError('SubscriptionUsername === SubscriberUser');
     },
