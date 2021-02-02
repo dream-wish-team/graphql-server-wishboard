@@ -155,7 +155,7 @@ module.exports = gql`
     likeWish(wishId: ID!): Wish!
     activeWish(wishId: ID!, visibility: String): Wish!
     fulfilledWish(wishId: ID!, visibility: String): Wish!
-    subscribeUser(subscriptionUsername: String!): [Friend]
+    subscribeUser(subscriptionUsername: String!): User
   }
   type Subscription {
     newWish: Wish!
