@@ -138,6 +138,7 @@ module.exports = {
     ) {
       const user = checkAuth(context);
       const infoUser = await User.findById(user.id);
+
       if (name.trim() === '') {
         throw new Error('Wish name must not be empty');
       }
@@ -145,13 +146,7 @@ module.exports = {
         throw new Error('Wish price must not be empty');
       }
       if (currency.trim() === '') {
-        throw new Error('Wish price must not be empty');
-      }
-      if (backgroundColor.trim() === '') {
-        throw new Error('Wish price must not be empty');
-      }
-      if (image.trim() === '') {
-        throw new Error('Wish image must not be empty');
+        throw new Error('Wish currency must not be empty');
       }
 
       const newWish = new Wish({
@@ -187,8 +182,8 @@ module.exports = {
         ],
       });
       const wish = await newWish.save();
-
-      return wish;
+      let wishes = await Wish.find({});
+      return wishes;
     },
     async deleteWish(_, { wishId }, context) {
       const user = checkAuth(context);
