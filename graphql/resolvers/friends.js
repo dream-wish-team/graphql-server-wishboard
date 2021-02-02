@@ -28,7 +28,7 @@ module.exports = {
         });
         return friends;
       } catch (err) {
-        throw new Error(err);
+        throw new AuthenticationError(err);
       }
     },
     async getSubscribers(_, { name, usernameOwner }, context) {
@@ -152,7 +152,7 @@ module.exports = {
         }
         await subscriptionUser.save();
         await subscriberUser.save();
-        return subscriptionUser.connectionsLists.subscribers;
+        return subscriptionUser;
       } else
         throw new UserInputError('SubscriptionUsername === SubscriberUser');
     },
