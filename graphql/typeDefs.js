@@ -142,13 +142,13 @@ module.exports = gql`
     createWish(
       name: String!
       price: String!
-      originURL: String
-      description: String
-      visibility: String
       currency: String!
       backgroundColor: String!
       image: String!
-    ): Wish!
+      originURL: String
+      description: String
+      visibility: String
+    ): [Wish!]
     deleteWish(wishId: ID!): String!
     createComment(wishId: ID!, usernameOwner: String!, body: String!): Wish!
     deleteComment(wishId: ID!, usernameOwner: String!, commentId: ID!): Wish!
