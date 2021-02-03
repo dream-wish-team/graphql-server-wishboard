@@ -111,14 +111,7 @@ module.exports = {
       const { id } = checkAuth(context);
 
       const user = await User.findById(id);
-
       if (user) {
-        if (small) {
-          user.avatar.small = small;
-        }
-        if (normal) {
-          user.avatar.normal = normal;
-        }
         if (name) {
           user.personalData.name = name;
         }
@@ -146,6 +139,9 @@ module.exports = {
         if (odnoklassniki) {
           user.socialNetworks.odnoklassniki = odnoklassniki;
         }
+        user.avatar.small = small;
+        user.avatar.normal = normal;
+
         user.tokenCount = 0;
         await user.save();
         return user;
