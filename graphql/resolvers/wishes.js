@@ -28,7 +28,7 @@ module.exports = {
             );
             item.active = item.active.slice(0, 1);
           });
-          return wishes;
+          return wishes.reverse();
         } else {
           const wishes = await Wish.find({
             name: { $regex: name, $options: 'i' },
